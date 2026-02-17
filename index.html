@@ -6,64 +6,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        :root { --primary: #4285F4; --dark-bg: #212121; }
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { margin: 0; padding: 0; font-family: sans-serif; }
         #map { height: 100vh; width: 100vw; transition: filter 0.3s; }
         
-        /* Estilo Modo Noturno */
+        /* Efeito de Modo Noite */
         .dark-mode #map { filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%); }
         
-        /* Botões de Interface */
         .controls {
-            position: absolute; top: 15px; left: 15px; right: 15px;
-            display: flex; justify-content: space-between; z-index: 2000;
+            position: absolute; top: 10px; width: 100%; display: flex; 
+            justify-content: center; gap: 10px; z-index: 2000;
         }
         .btn {
             background: white; border: none; padding: 10px 15px;
-            border-radius: 12px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            cursor: pointer; display: flex; align-items: center; gap: 5px;
+            border-radius: 20px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         .btn-night { background: #333; color: white; }
-        
-        .nav-footer {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            z-index: 2000; width: 85%;
-        }
-        .btn-start {
-            width: 100%; padding: 18px; background: var(--primary); color: white;
-            border: none; border-radius: 50px; font-size: 16px; font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+
+        /* Estilo dos Números nas Estações */
+        .number-icon {
+            background: #4285F4; border: 2px solid white; border-radius: 50%;
+            color: white; font-weight: bold; text-align: center;
+            line-height: 24px; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* Ícones com Números */
-        .number-icon {
-            background: var(--primary); border: 2px solid white; border-radius: 50%;
-            color: white; font-weight: bold; text-align: center; font-size: 14px;
-            line-height: 24px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        .nav-footer {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 2000; width: 80%;
         }
-        .station-visited { background: #34A853 !important; }
+        .btn-start {
+            width: 100%; padding: 15px; background: #4285F4; color: white;
+            border: none; border-radius: 30px; font-size: 16px; font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
     <div class="controls">
-        <button class="btn btn-night" onclick="toggleNightMode()">🌙 Modo Noite</button>
-        <div class="btn" style="pointer-events: none;">🚶 1.2km | 18min</div>
+        <button class="btn btn-night" onclick="document.body.classList.toggle('dark-mode')">🌙 Modo Noite</button>
+        <div class="btn">🚶 1.2km | 18min</div>
     </div>
 
-    <button class="nav-footer btn-start" id="startBtn" onclick="iniciarNav()">🚀 INICIAR NAVEGAÇÃO</button>
+    <div class="nav-footer">
+        <button class="btn-start" id="startBtn" onclick="iniciarNav()">🚀 INICIAR NAVEGAÇÃO</button>
+    </div>
     
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         var map = L.map('map', { zoomControl: false }).setView([41.17597, -8.63472], 16);
-        var isNight = false;
-        var userMarker;
-
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Carregar a Rota e os Pontos
+        var userMarker;
+        var isNavigating = false;
+
         fetch('rota.geojson')
             .then(r => r.json())
             .then(data => {
@@ -72,28 +68,33 @@
                         if (f.geometry.type === 'LineString') return { color: '#4285F4', weight: 6, opacity: 0.6 };
                     },
                     pointToLayer: function(f, latlng) {
-                        // Criar número da estação (ex: "1" em vez de "1ª Estação")
-                        var num = f.properties.nome.match(/\d+/);
+                        // Extrai o número do nome (ex: "1" de "1ª Estação")
+                        var label = f.properties.nome.replace(/\D/g, ""); 
                         var icon = L.divIcon({
                             className: 'number-icon',
-                            html: num ? num[0] : '•',
-                            iconSize: [26, 26]
+                            html: label || "•",
+                            iconSize: [24, 24]
                         });
-                        
-                        var marker = L.marker(latlng, { icon: icon });
-                        
-                        // Mudar cor ao clicar (Progresso)
-                        marker.on('click', function(e) {
-                            e.target._icon.classList.add('station-visited');
-                            marker.bindPopup("<b>" + f.properties.nome + "</b>").openPopup();
-                        });
-                        
-                        return marker;
+                        return L.marker(latlng, { icon: icon }).bindPopup("<b>" + f.properties.nome + "</b>");
                     }
                 }).addTo(map);
             });
 
-        function toggleNightMode() {
-            document.body.classList.toggle('dark-mode');
-            isNight = !isNight;
+        function iniciarNav() {
+            isNavigating = true;
+            document.getElementById('startBtn').innerHTML = "📍 GPS ATIVO";
+            document.getElementById('startBtn').style.background = "#34A853";
+            map.locate({ setView: true, watch: true, maxZoom: 18, enableHighAccuracy: true });
         }
+
+        map.on('locationfound', function(e) {
+            if (!userMarker) {
+                userMarker = L.circleMarker(e.latlng, { radius: 8, color: 'white', fillColor: '#4285F4', fillOpacity: 1, weight: 3 }).addTo(map);
+            } else {
+                userMarker.setLatLng(e.latlng);
+            }
+            if (isNavigating) map.panTo(e.latlng);
+        });
+    </script>
+</body>
+</html>
