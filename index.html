@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html>
 <head>
     <meta charset="utf-8" />
-    <title>Via-Sacra Porto</title>
+    <title>Via-Sacra Digital</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body { margin: 0; padding: 0; }
         #map { height: 100vh; width: 100vw; }
-        .nav-btn {
+        .nav-button {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             z-index: 2000; background: #4285F4; color: white; border: none;
-            padding: 18px 30px; border-radius: 50px; font-size: 18px; font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 80%;
+            padding: 15px 25px; border-radius: 30px; font-weight: bold; font-size: 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); width: 80%; cursor: pointer;
         }
     </style>
 </head>
 <body>
-
-    <button class="nav-btn" id="gpsBtn" onclick="startNav()">🚀 INICIAR NAVEGAÇÃO</button>
+    <button class="nav-button" id="startBtn" onclick="iniciarGPS()">🚀 INICIAR NAVEGAÇÃO</button>
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -27,41 +26,34 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
         var userMarker;
-        var isNavigating = false;
 
-        // ESTA É A PARTE QUE CORRIGE OS PONTOS
+        // CARREGA A ROTA E AS ESTAÇÕES
         fetch('rota.geojson')
             .then(r => r.json())
             .then(data => {
                 L.geoJSON(data, {
-                    style: function(feature) {
-                        if (feature.geometry.type === 'LineString') {
-                            return { color: '#4285F4', weight: 7, opacity: 0.7 };
-                        }
+                    style: function(f) {
+                        if (f.geometry.type === 'LineString') return { color: '#4285F4', weight: 8, opacity: 0.6 };
                     },
-                    pointToLayer: function(feature, latlng) {
-                        // Força a criação de um marcador para cada ponto
-                        return L.marker(latlng).bindPopup("<b>" + feature.properties.nome + "</b>");
+                    pointToLayer: function(f, latlng) {
+                        return L.marker(latlng).bindPopup("<b>" + f.properties.nome + "</b>");
                     }
                 }).addTo(map);
-            })
-            .catch(err => console.error("Erro ao ler pontos:", err));
+            });
 
-        function startNav() {
-            isNavigating = true;
-            document.getElementById('gpsBtn').innerHTML = "📍 A NAVEGAR...";
+        function iniciarGPS() {
+            document.getElementById('startBtn').innerHTML = "📍 GPS ATIVO - A SEGUIR";
+            document.getElementById('startBtn').style.background = "#34A853";
             map.locate({ setView: true, watch: true, maxZoom: 18, enableHighAccuracy: true });
         }
 
         map.on('locationfound', function(e) {
             if (!userMarker) {
-                userMarker = L.circleMarker(e.latlng, { radius: 9, color: 'white', fillColor: '#4285F4', fillOpacity: 1, weight: 3 }).addTo(map);
+                userMarker = L.circleMarker(e.latlng, { radius: 10, color: 'white', fillColor: '#4285F4', fillOpacity: 1, weight: 3 }).addTo(map);
             } else {
                 userMarker.setLatLng(e.latlng);
             }
-            if (isNavigating) {
-                map.panTo(e.latlng);
-            }
+            map.panTo(e.latlng); // FAZ O MAPA SEGUIR A PESSOA
         });
     </script>
 </body>
