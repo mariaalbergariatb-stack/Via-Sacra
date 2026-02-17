@@ -2,86 +2,42 @@
 <html lang="pt">
 <head>
     <meta charset="utf-8" />
-    <title>Via-Sacra Porto</title>
+    <title>Via-Sacra Interativa</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
     <style>
-        body { margin: 0; padding: 0; font-family: sans-serif; }
+        body { margin: 0; padding: 0; }
         #map { height: 100vh; width: 100vw; }
-        
-        .locate-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            background: #fff;
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .btn-gps {
+            position: absolute; top: 15px; right: 15px; z-index: 1000;
+            background: #007bff; color: white; padding: 12px;
+            border-radius: 50px; border: none; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;
         }
     </style>
 </head>
 <body>
-
+    <button class="btn-gps" onclick="map.locate({setView: true, watch: true, maxZoom: 18})">📍 Seguir GPS</button>
     <div id="map"></div>
-    <div class="locate-button" onclick="getLocation()">📍 Minha Posição</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <script>
-        // 1. Inicializar o Mapa
         var map = L.map('map').setView([41.177, -8.640], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // 2. Adicionar o desenho do mapa (OpenStreetMap)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        // 3. Carregar a Rota do ficheiro rota.geojson
         fetch('rota.geojson')
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
-                var routeLayer = L.geoJSON(data, {
-                    style: {
-                        color: '#e74c3c', // Cor vermelha
-                        weight: 6,        // Espessura da linha
-                        opacity: 0.8
-                    }
+                var layer = L.geoJSON(data, {
+                    style: (f) => f.geometry.type === 'LineString' ? {color: 'red', weight: 5} : {},
+                    pointToLayer: (f, latlng) => L.marker(latlng).bindPopup('<b>' + f.properties.nome + '</b>')
                 }).addTo(map);
-                
-                // Ajustar o zoom para ver a rota toda no início
-                map.fitBounds(routeLayer.getBounds());
-            })
-            .catch(err => console.error('Erro ao carregar rota:', err));
+                map.fitBounds(layer.getBounds());
+            });
 
-        // 4. GPS e Localização
-        var userMarker, userCircle;
-
-        function onLocationFound(e) {
-            var radius = e.accuracy / 2;
-
-            if (userMarker) {
-                userMarker.setLatLng(e.latlng);
-                userCircle.setLatLng(e.latlng).setRadius(radius);
-            } else {
-                userMarker = L.marker(e.latlng).addTo(map).bindPopup("Está aqui");
-                userCircle = L.circle(e.latlng, radius).addTo(map);
-            }
-        }
-
-        map.on('locationfound', onLocationFound);
-
-        function getLocation() {
-            // Ativa o GPS e segue a posição
-            map.locate({setView: true, maxZoom: 17, watch: true});
-        }
+        map.on('locationfound', (e) => {
+            L.circle(e.latlng, {radius: 5, color: 'blue', fillOpacity: 1}).addTo(map);
+        });
     </script>
 </body>
 </html>
