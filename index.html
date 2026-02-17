@@ -2,64 +2,98 @@
 <html lang="pt">
 <head>
     <meta charset="utf-8" />
-    <title>Via-Sacra Porto</title>
+    <title>Via-Sacra Digital</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body { margin: 0; padding: 0; }
-        #map { height: 100vh; width: 100vw; }
-        .nav-btn {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            z-index: 2000; background: #4285F4; color: white; border: none;
-            padding: 18px 30px; border-radius: 50px; font-size: 18px; font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 80%;
+        :root { --primary: #4285F4; --dark-bg: #212121; }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        #map { height: 100vh; width: 100vw; transition: filter 0.3s; }
+        
+        /* Estilo Modo Noturno */
+        .dark-mode #map { filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%); }
+        
+        /* Botões de Interface */
+        .controls {
+            position: absolute; top: 15px; left: 15px; right: 15px;
+            display: flex; justify-content: space-between; z-index: 2000;
         }
+        .btn {
+            background: white; border: none; padding: 10px 15px;
+            border-radius: 12px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            cursor: pointer; display: flex; align-items: center; gap: 5px;
+        }
+        .btn-night { background: #333; color: white; }
+        
+        .nav-footer {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 2000; width: 85%;
+        }
+        .btn-start {
+            width: 100%; padding: 18px; background: var(--primary); color: white;
+            border: none; border-radius: 50px; font-size: 16px; font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* Ícones com Números */
+        .number-icon {
+            background: var(--primary); border: 2px solid white; border-radius: 50%;
+            color: white; font-weight: bold; text-align: center; font-size: 14px;
+            line-height: 24px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .station-visited { background: #34A853 !important; }
     </style>
 </head>
 <body>
-    <button class="nav-btn" id="gpsBtn" onclick="startNav()">🚀 INICIAR NAVEGAÇÃO</button>
+
+    <div class="controls">
+        <button class="btn btn-night" onclick="toggleNightMode()">🌙 Modo Noite</button>
+        <div class="btn" style="pointer-events: none;">🚶 1.2km | 18min</div>
+    </div>
+
+    <button class="nav-footer btn-start" id="startBtn" onclick="iniciarNav()">🚀 INICIAR NAVEGAÇÃO</button>
+    
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         var map = L.map('map', { zoomControl: false }).setView([41.17597, -8.63472], 16);
+        var isNight = false;
+        var userMarker;
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Forçar os ícones a aparecerem corretamente
-        delete L.Icon.Default.prototype._getIconUrl;
-        L.Icon.Default.mergeOptions({
-            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-        });
-
-        fetch('rota.geojson?v=' + new Date().getTime()) // O '?v=' força o mapa a carregar dados novos
+        // Carregar a Rota e os Pontos
+        fetch('rota.geojson')
             .then(r => r.json())
             .then(data => {
                 L.geoJSON(data, {
                     style: function(f) {
-                        if (f.geometry.type === 'LineString') return { color: '#4285F4', weight: 8, opacity: 0.7 };
+                        if (f.geometry.type === 'LineString') return { color: '#4285F4', weight: 6, opacity: 0.6 };
                     },
                     pointToLayer: function(f, latlng) {
-                        return L.marker(latlng).bindPopup("<b>" + f.properties.nome + "</b>");
+                        // Criar número da estação (ex: "1" em vez de "1ª Estação")
+                        var num = f.properties.nome.match(/\d+/);
+                        var icon = L.divIcon({
+                            className: 'number-icon',
+                            html: num ? num[0] : '•',
+                            iconSize: [26, 26]
+                        });
+                        
+                        var marker = L.marker(latlng, { icon: icon });
+                        
+                        // Mudar cor ao clicar (Progresso)
+                        marker.on('click', function(e) {
+                            e.target._icon.classList.add('station-visited');
+                            marker.bindPopup("<b>" + f.properties.nome + "</b>").openPopup();
+                        });
+                        
+                        return marker;
                     }
                 }).addTo(map);
             });
 
-        function startNav() {
-            document.getElementById('gpsBtn').innerHTML = "📍 A SEGUIR PERCURSO";
-            map.locate({ setView: true, watch: true, maxZoom: 18, enableHighAccuracy: true });
+        function toggleNightMode() {
+            document.body.classList.toggle('dark-mode');
+            isNight = !isNight;
         }
-
-        map.on('locationfound', function(e) {
-            var radius = e.accuracy / 2;
-            if (!window.userMarker) {
-                window.userMarker = L.circleMarker(e.latlng, {radius: 10, color: 'white', fillColor: '#4285F4', fillOpacity: 1}).addTo(map);
-            } else {
-                window.userMarker.setLatLng(e.latlng);
-            }
-            map.panTo(e.latlng);
-        });
-    </script>
-</body>
-</html>
