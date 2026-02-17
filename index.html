@@ -2,54 +2,45 @@
 <html lang="pt">
 <head>
     <meta charset="utf-8" />
-    <title>Via-Sacra Digital</title>
+    <title>Via-Sacra GPS Pro</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body { margin: 0; padding: 0; font-family: sans-serif; }
-        #map { height: 100vh; width: 100vw; transition: filter 0.3s; }
+        body { margin: 0; padding: 0; font-family: -apple-system, sans-serif; background: #f4f4f4; }
+        #map { height: 100vh; width: 100vw; }
         
-        /* Efeito de Modo Noite */
-        .dark-mode #map { filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%); }
-        
-        .controls {
-            position: absolute; top: 10px; width: 100%; display: flex; 
-            justify-content: center; gap: 10px; z-index: 2000;
+        /* Painel de Progresso Dinâmico */
+        .progress-panel {
+            position: absolute; top: 10px; left: 10px; right: 10px;
+            background: white; padding: 15px; border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 2000;
+            display: flex; flex-direction: column; align-items: center;
         }
-        .btn {
-            background: white; border: none; padding: 10px 15px;
-            border-radius: 20px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        .btn-night { background: #333; color: white; }
+        .dist-info { font-size: 18px; font-weight: bold; color: #4285F4; }
+        .next-station { font-size: 14px; color: #666; margin-top: 4px; }
+        .arrived { background: #34A853 !important; color: white !important; }
 
-        /* Estilo dos Números nas Estações */
         .number-icon {
             background: #4285F4; border: 2px solid white; border-radius: 50%;
             color: white; font-weight: bold; text-align: center;
-            line-height: 24px; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            line-height: 26px; font-size: 13px;
         }
 
-        .nav-footer {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 2000; width: 80%;
-        }
         .btn-start {
-            width: 100%; padding: 15px; background: #4285F4; color: white;
-            border: none; border-radius: 30px; font-size: 16px; font-weight: bold;
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 2000; width: 80%; padding: 15px; background: #4285F4;
+            color: white; border: none; border-radius: 30px; font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <div class="controls">
-        <button class="btn btn-night" onclick="document.body.classList.toggle('dark-mode')">🌙 Modo Noite</button>
-        <div class="btn">🚶 1.2km | 18min</div>
+    <div class="progress-panel" id="p-panel">
+        <div class="dist-info" id="dist-text">Aguardando GPS...</div>
+        <div class="next-station" id="next-text">Inicie a navegação para ver a distância</div>
     </div>
 
-    <div class="nav-footer">
-        <button class="btn-start" id="startBtn" onclick="iniciarNav()">🚀 INICIAR NAVEGAÇÃO</button>
-    </div>
-    
+    <button class="btn-start" id="startBtn" onclick="ativarGPS()">🚀 INICIAR VIA-SACRA</button>
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -57,44 +48,70 @@
         var map = L.map('map', { zoomControl: false }).setView([41.17597, -8.63472], 16);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
+        var stations = [];
         var userMarker;
-        var isNavigating = false;
+        var currentTargetIndex = 0;
 
+        // 1. Carregar Estações
         fetch('rota.geojson')
             .then(r => r.json())
             .then(data => {
                 L.geoJSON(data, {
-                    style: function(f) {
-                        if (f.geometry.type === 'LineString') return { color: '#4285F4', weight: 6, opacity: 0.6 };
-                    },
                     pointToLayer: function(f, latlng) {
-                        // Extrai o número do nome (ex: "1" de "1ª Estação")
-                        var label = f.properties.nome.replace(/\D/g, ""); 
-                        var icon = L.divIcon({
-                            className: 'number-icon',
-                            html: label || "•",
-                            iconSize: [24, 24]
-                        });
-                        return L.marker(latlng, { icon: icon }).bindPopup("<b>" + f.properties.nome + "</b>");
-                    }
+                        if (f.geometry.type === "Point") {
+                            stations.push({ latlng: latlng, nome: f.properties.nome });
+                            var label = f.properties.nome.replace(/\D/g, "");
+                            var icon = L.divIcon({ className: 'number-icon', html: label, iconSize: [26, 26] });
+                            return L.marker(latlng, { icon: icon });
+                        }
+                    },
+                    style: { color: '#4285F4', weight: 5, opacity: 0.5 }
                 }).addTo(map);
             });
 
-        function iniciarNav() {
-            isNavigating = true;
-            document.getElementById('startBtn').innerHTML = "📍 GPS ATIVO";
-            document.getElementById('startBtn').style.background = "#34A853";
-            map.locate({ setView: true, watch: true, maxZoom: 18, enableHighAccuracy: true });
+        function ativarGPS() {
+            document.getElementById('startBtn').style.display = 'none';
+            map.locate({ setView: true, watch: true, enableHighAccuracy: true });
         }
 
         map.on('locationfound', function(e) {
             if (!userMarker) {
-                userMarker = L.circleMarker(e.latlng, { radius: 8, color: 'white', fillColor: '#4285F4', fillOpacity: 1, weight: 3 }).addTo(map);
+                userMarker = L.circleMarker(e.latlng, { radius: 10, color: 'white', fillColor: '#4285F4', fillOpacity: 1 }).addTo(map);
             } else {
                 userMarker.setLatLng(e.latlng);
             }
-            if (isNavigating) map.panTo(e.latlng);
+            map.panTo(e.latlng);
+            calcularProgresso(e.latlng);
         });
+
+        function calcularProgresso(userLatLng) {
+            if (stations.length === 0) return;
+
+            var target = stations[currentTargetIndex];
+            var dist = userLatLng.distanceTo(target.latlng); // Distância em metros
+
+            var distText = document.getElementById('dist-text');
+            var nextText = document.getElementById('next-text');
+            var panel = document.getElementById('p-panel');
+
+            if (dist < 20) { // Se estiver a menos de 20 metros
+                distText.innerHTML = "📍 CHEGOU!";
+                nextText.innerHTML = "Você está na " + target.nome;
+                panel.classList.add('arrived');
+                
+                // Passa para a próxima estação após 10 segundos se houver mais
+                setTimeout(() => {
+                    if (dist < 20 && currentTargetIndex < stations.length - 1) {
+                        currentTargetIndex++;
+                        panel.classList.remove('arrived');
+                    }
+                }, 10000);
+            } else {
+                panel.classList.remove('arrived');
+                distText.innerHTML = "Faltam " + Math.round(dist) + " metros";
+                nextText.innerHTML = "Próximo destino: " + target.nome;
+            }
+        }
     </script>
 </body>
 </html>
