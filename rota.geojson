@@ -7,28 +7,18 @@
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [-8.63293, 41.17558],
-          [-8.63472, 41.17597],
-          [-8.63766, 41.17552],
-          [-8.63724, 41.17381],
-          [-8.63741, 41.17361],
-          [-8.63913, 41.17316],
-          [-8.64066, 41.17388],
-          [-8.64088, 41.17683],
-          [-8.64191, 41.17774],
-          [-8.64319, 41.17808],
-          [-8.64430, 41.17863],
-          [-8.64580, 41.17988],
-          [-8.64602, 41.18102],
-          [-8.64733, 41.18077],
-          [-8.64720, 41.18140]
+          [-8.63293, 41.17558], [-8.63472, 41.17597], [-8.63766, 41.17552], 
+          [-8.63730, 41.17380], [-8.63741, 41.17361], [-8.63913, 41.17316], 
+          [-8.64066, 41.17388], [-8.64088, 41.17683], [-8.64191, 41.17774], 
+          [-8.64319, 41.17808], [-8.64430, 41.17863], [-8.64580, 41.17988], 
+          [-8.64602, 41.18102], [-8.64733, 41.18077], [-8.64720, 41.18140]
         ]
       }
     },
     { "type": "Feature", "properties": { "nome": "1ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.63293, 41.17558] } },
     { "type": "Feature", "properties": { "nome": "2ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.63472, 41.17597] } },
     { "type": "Feature", "properties": { "nome": "3ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.63766, 41.17552] } },
-    { "type": "Feature", "properties": { "nome": "4ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.63724, 41.17381] } },
+    { "type": "Feature", "properties": { "nome": "4ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.63730, 41.17380] } },
     { "type": "Feature", "properties": { "nome": "5ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.63741, 41.17361] } },
     { "type": "Feature", "properties": { "nome": "6ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.63913, 41.17316] } },
     { "type": "Feature", "properties": { "nome": "7ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.64066, 41.17388] } },
