@@ -7,28 +7,14 @@
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [-8.634722, 41.175972], [-8.6358, 41.1758], [-8.6369, 41.1757], 
-          [-8.6376, 41.1755], [-8.6375, 41.1745], [-8.6374, 41.1736], 
-          [-8.6382, 41.1733], [-8.6391, 41.1731], [-8.6400, 41.1734], 
-          [-8.6406, 41.1738], [-8.6407, 41.1755], [-8.6415, 41.1772], 
-          [-8.6430, 41.1780], [-8.6450, 41.1790], [-8.6474, 41.1804]
+          [-8.63472, 41.17597], [-8.63533, 41.17592], [-8.63600, 41.17585],
+          [-8.63765, 41.17551], [-8.63755, 41.17480], [-8.63740, 41.17361],
+          [-8.63850, 41.17320], [-8.63914, 41.17315], [-8.64058, 41.17385],
+          [-8.64070, 41.17500], [-8.64085, 41.17682], [-8.64188, 41.17773],
+          [-8.64312, 41.17805], [-8.64434, 41.17862], [-8.64600, 41.17950],
+          [-8.64741, 41.18045]
         ]
       }
-    },
-    { "type": "Feature", "properties": { "id": 1, "nome": "1ª Estação: Jesus é condenado à morte" }, "geometry": { "type": "Point", "coordinates": [-8.634722, 41.175972] } },
-    { "type": "Feature", "properties": { "id": 2, "nome": "2ª Estação: Jesus carrega a cruz" }, "geometry": { "type": "Point", "coordinates": [-8.6358, 41.1758] } },
-    { "type": "Feature", "properties": { "id": 3, "nome": "3ª Estação: Jesus cai pela primeira vez" }, "geometry": { "type": "Point", "coordinates": [-8.6369, 41.1757] } },
-    { "type": "Feature", "properties": { "id": 4, "nome": "4ª Estação: Jesus encontra a sua Mãe" }, "geometry": { "type": "Point", "coordinates": [-8.6376, 41.1755] } },
-    { "type": "Feature", "properties": { "id": 5, "nome": "5ª Estação: Cirineu ajuda Jesus" }, "geometry": { "type": "Point", "coordinates": [-8.6375, 41.1745] } },
-    { "type": "Feature", "properties": { "id": 6, "nome": "6ª Estação: Verónica limpa o rosto de Jesus" }, "geometry": { "type": "Point", "coordinates": [-8.6374, 41.1736] } },
-    { "type": "Feature", "properties": { "id": 7, "nome": "7ª Estação: Jesus cai pela segunda vez" }, "geometry": { "type": "Point", "coordinates": [-8.6382, 41.1733] } },
-    { "type": "Feature", "properties": { "id": 8, "nome": "8ª Estação: Jesus encontra as mulheres de Jerusalém" }, "geometry": { "type": "Point", "coordinates": [-8.6391, 41.1731] } },
-    { "type": "Feature", "properties": { "id": 9, "nome": "9ª Estação: Jesus cai pela terceira vez" }, "geometry": { "type": "Point", "coordinates": [-8.6400, 41.1734] } },
-    { "type": "Feature", "properties": { "id": 10, "nome": "10ª Estação: Jesus é despojado das suas vestes" }, "geometry": { "type": "Point", "coordinates": [-8.6406, 41.1738] } },
-    { "type": "Feature", "properties": { "id": 11, "nome": "11ª Estação: Jesus é pregado na cruz" }, "geometry": { "type": "Point", "coordinates": [-8.6407, 41.1755] } },
-    { "type": "Feature", "properties": { "id": 12, "nome": "12ª Estação: Jesus morre na cruz" }, "geometry": { "type": "Point", "coordinates": [-8.6415, 41.1772] } },
-    { "type": "Feature", "properties": { "id": 13, "nome": "13ª Estação: Jesus é descido da cruz" }, "geometry": { "type": "Point", "coordinates": [-8.6430, 41.1780] } },
-    { "type": "Feature", "properties": { "id": 14, "nome": "14ª Estação: Jesus é depositado no sepulcro" }, "geometry": { "type": "Point", "coordinates": [-8.6450, 41.1790] } },
-    { "type": "Feature", "properties": { "id": 15, "nome": "15ª Estação: A Ressurreição" }, "geometry": { "type": "Point", "coordinates": [-8.6474, 41.1804] } }
+    }
   ]
 }
