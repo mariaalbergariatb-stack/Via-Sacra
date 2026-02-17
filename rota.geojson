@@ -3,23 +3,30 @@
   "features": [
     {
       "type": "Feature",
-      "properties": {},
+      "properties": { "tipo": "caminho" },
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [-8.634722, 41.175972],
-          [-8.6347, 41.1759],
-          [-8.6376, 41.1755],
-          [-8.6374, 41.1736],
-          [-8.6391, 41.1731],
-          [-8.6406, 41.1738],
-          [-8.6408, 41.1768],
-          [-8.6419, 41.1777],
-          [-8.6431, 41.1780],
-          [-8.6443, 41.1786],
-          [-8.6474, 41.1804]
+          [-8.634722, 41.175972], [-8.63805, 41.175], [-8.6376, 41.1736], 
+          [-8.6391, 41.1731], [-8.6406, 41.1738], [-8.6408, 41.1768], 
+          [-8.6419, 41.1777], [-8.6431, 41.1780], [-8.6443, 41.1786], [-8.6474, 41.1804]
         ]
       }
-    }
+    },
+    { "type": "Feature", "properties": { "nome": "1ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.634722, 41.175972] } },
+    { "type": "Feature", "properties": { "nome": "2ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.6358, 41.1758] } },
+    { "type": "Feature", "properties": { "nome": "3ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.6369, 41.1757] } },
+    { "type": "Feature", "properties": { "nome": "4ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.6376, 41.1755] } },
+    { "type": "Feature", "properties": { "nome": "5ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.6375, 41.1745] } },
+    { "type": "Feature", "properties": { "nome": "6ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.6374, 41.1736] } },
+    { "type": "Feature", "properties": { "nome": "7ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.6382, 41.1733] } },
+    { "type": "Feature", "properties": { "nome": "8ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.6391, 41.1731] } },
+    { "type": "Feature", "properties": { "nome": "9ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.6400, 41.1734] } },
+    { "type": "Feature", "properties": { "nome": "10ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.6406, 41.1738] } },
+    { "type": "Feature", "properties": { "nome": "11ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.6407, 41.1755] } },
+    { "type": "Feature", "properties": { "nome": "12ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.6415, 41.1772] } },
+    { "type": "Feature", "properties": { "nome": "13ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.6430, 41.1780] } },
+    { "type": "Feature", "properties": { "nome": "14ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.6450, 41.1790] } },
+    { "type": "Feature", "properties": { "nome": "15ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.6474, 41.1804] } }
   ]
 }
