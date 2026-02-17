@@ -11,7 +11,7 @@
           [-8.63730, 41.17380], [-8.63741, 41.17361], [-8.63913, 41.17316], 
           [-8.64066, 41.17388], [-8.64088, 41.17683], [-8.64191, 41.17774], 
           [-8.64319, 41.17808], [-8.64430, 41.17863], [-8.64580, 41.17988], 
-          [-8.64602, 41.18102], [-8.64733, 41.18077], [-8.64720, 41.18140]
+          [-8.64602, 41.18102], [-8.64733, 41.18077], [-8.64751, 41.18040]
         ]
       }
     },
@@ -29,6 +29,6 @@
     { "type": "Feature", "properties": { "nome": "12ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.64580, 41.17988] } },
     { "type": "Feature", "properties": { "nome": "13ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.64602, 41.18102] } },
     { "type": "Feature", "properties": { "nome": "14ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.64733, 41.18077] } },
-    { "type": "Feature", "properties": { "nome": "15ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.64720, 41.18140] } }
+    { "type": "Feature", "properties": { "nome": "15ª Estação" }, "geometry": { "type": "Point", "coordinates": [-8.64751, 41.18040] } }
   ]
 }
