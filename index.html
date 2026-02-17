@@ -2,84 +2,56 @@
 <html lang="pt">
 <head>
     <meta charset="utf-8" />
-    <title>Via-Sacra - GPS Ativo</title>
+    <title>Via-Sacra Porto</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body { margin: 0; padding: 0; font-family: sans-serif; }
+        body { margin: 0; padding: 0; }
         #map { height: 100vh; width: 100vw; }
-        
-        .nav-overlay {
+        .nav-btn {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            z-index: 2000; width: 90%;
+            z-index: 2000; background: #4285F4; color: white; border: none;
+            padding: 18px 30px; border-radius: 50px; font-size: 18px; font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 80%;
         }
-
-        .btn-start {
-            width: 100%; background: #007bff; color: white; border: none;
-            padding: 20px; border-radius: 15px; font-size: 20px; font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3); cursor: pointer;
-        }
-
-        .btn-start.active { background: #dc3545; }
     </style>
 </head>
 <body>
 
-    <div class="nav-overlay">
-        <button class="btn-start" id="navBtn" onclick="toggleNavigation()">▶ INICIAR CAMINHO</button>
-    </div>
-    
+    <button class="nav-btn" id="gpsBtn" onclick="startNav()">🚀 INICIAR NAVEGAÇÃO</button>
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         var map = L.map('map', { zoomControl: false }).setView([41.17597, -8.63472], 17);
-        var isNavigating = false;
-        var userMarker, userCircle;
-
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Carregar a Rota e as Estações
+        var userMarker;
+
+        // Carregar a rota e estações
         fetch('rota.geojson')
             .then(r => r.json())
             .then(data => {
                 L.geoJSON(data, {
-                    style: function(f) {
-                        return { color: '#007bff', weight: 8, opacity: 0.7 }; // Azul Google
-                    },
-                    pointToLayer: function(f, latlng) {
-                        return L.marker(latlng).bindPopup("<b>" + f.properties.nome + "</b>");
-                    }
+                    style: { color: '#4285F4', weight: 8, opacity: 0.7 },
+                    pointToLayer: (f, latlng) => L.marker(latlng).bindPopup(f.properties.nome)
                 }).addTo(map);
             });
 
-        function toggleNavigation() {
-            var btn = document.getElementById('navBtn');
-            if (!isNavigating) {
-                isNavigating = true;
-                btn.innerHTML = "⏹ PARAR NAVEGAÇÃO";
-                btn.classList.add('active');
-                map.locate({ setView: true, watch: true, maxZoom: 19, enableHighAccuracy: true });
-            } else {
-                isNavigating = false;
-                btn.innerHTML = "▶ INICIAR CAMINHO";
-                btn.classList.remove('active');
-                map.stopLocate();
-            }
+        function startNav() {
+            document.getElementById('gpsBtn').style.display = 'none';
+            // Ativa o GPS em modo "watch" (atualiza sozinho enquanto andas)
+            map.locate({ setView: true, watch: true, maxZoom: 19, enableHighAccuracy: true });
         }
 
         map.on('locationfound', function(e) {
             if (!userMarker) {
-                userMarker = L.circleMarker(e.latlng, { radius: 10, color: '#fff', fillColor: '#007bff', fillOpacity: 1, weight: 3 }).addTo(map);
-                userCircle = L.circle(e.latlng, { radius: e.accuracy, color: '#007bff', opacity: 0.1 }).addTo(map);
+                userMarker = L.circleMarker(e.latlng, { radius: 10, color: 'white', fillColor: '#4285F4', fillOpacity: 1, weight: 3 }).addTo(map);
             } else {
                 userMarker.setLatLng(e.latlng);
-                userCircle.setLatLng(e.latlng).setRadius(e.accuracy);
             }
-            // Isto mantém o utilizador no centro do ecrã enquanto ele caminha
-            if (isNavigating) {
-                map.panTo(e.latlng);
-            }
+            // Isto faz o mapa "andar" contigo no centro
+            map.panTo(e.latlng);
         });
     </script>
 </body>
